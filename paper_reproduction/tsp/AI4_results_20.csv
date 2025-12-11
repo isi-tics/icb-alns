@@ -1,0 +1,7 @@
+Method,Avg,Nr. Best,Time/Instance
+ALNS,5.320,71,21.02
+DR-ALNS,5.230,71,7.55
+KMeans-Vanilla,5.302,187,26.99
+KMeans,5.274,71,15.16
+PCA-Vanilla,5.310,71,17.57
+PCA,5.254,71,15.22

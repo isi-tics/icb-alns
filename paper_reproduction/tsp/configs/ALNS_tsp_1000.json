@@ -1,0 +1,13 @@
+{
+    "rseed": 1,
+    "instance_file": "tsp_100_10000.pkl",
+    "iterations": 1000,
+    "instance_nr": 5000,
+    "w1": 5,
+    "w2": 3,
+    "w3": 1,
+    "decay": 0.8,
+    "degree_of_destruction": null,
+    "use_cluster": false,
+    "use_pca": false
+}

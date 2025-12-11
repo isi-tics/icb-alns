@@ -1,0 +1,13 @@
+{
+    "instance_file": "ai4.pkl",
+    "rseed": 1,
+    "iterations": 200,
+    "instance_nr": 250,
+    "customers": 100,
+    "w1": 34.3,
+    "w2": 27.5,
+    "w3": 17.6,
+    "dod": 0.35,
+    "decay": 0.65,
+    "use_pca": false
+}
