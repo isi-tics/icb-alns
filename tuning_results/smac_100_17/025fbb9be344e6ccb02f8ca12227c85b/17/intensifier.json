@@ -1,0 +1,39 @@
+{
+  "incumbent_ids": [
+    2
+  ],
+  "rejected_config_ids": [
+    1
+  ],
+  "incumbents_changed": 2,
+  "trajectory": [
+    {
+      "config_ids": [
+        1
+      ],
+      "costs": [
+        -11.411173333333334
+      ],
+      "trial": 1,
+      "walltime": 487.9908072948456
+    },
+    {
+      "config_ids": [
+        2
+      ],
+      "costs": [
+        -12.26856
+      ],
+      "trial": 4,
+      "walltime": 2431.3164739608765
+    }
+  ],
+  "state": {
+    "queue": [
+      [
+        3,
+        1
+      ]
+    ]
+  }
+}
