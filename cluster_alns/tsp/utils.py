@@ -125,9 +125,9 @@ def tour_check(tour, x, time_matrix, maxT_pen, tw_pen, n_nodes):
 def find_optimal_k_elbow_op(x_matrix, random_state, max_k=15):
     """
     Calculates K-Optimal for Orienteering using (X, Y, Prize).
-    Assumes x_matrix columns: [0]=X, [1]=Y, [-2]=Prize
+    Assumes x_matrix columns: [0]=ID, [1]=X, [2]=Y, [-2]=Prize
     """
-    data = x_matrix[:, [0, 1, -2]]
+    data = x_matrix[:, [1, 2, -2]]
     
     if len(data) < 3:
         return 2

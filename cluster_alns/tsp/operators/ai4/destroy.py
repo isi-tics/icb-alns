@@ -138,8 +138,8 @@ def _get_node_features(current, nodes_list):
     all_features = current.x
     for node_id in nodes_list:
         idx = node_id - 1
-        x_coord = all_features[idx][0]
-        y_coord = all_features[idx][1]
+        x_coord = all_features[idx][1]
+        y_coord = all_features[idx][2]
         prize = all_features[idx][-2]
         features.append([node_id, x_coord, y_coord, prize])
     return pd.DataFrame(features, columns=["id", "x", "y", "prize"])
