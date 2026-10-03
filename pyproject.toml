@@ -91,6 +91,9 @@ dev = [
     "isort>=7.0.0",
     "ruff>=0.14.7",
 ]
+tune = [
+    "smac>=2.0",
+]
 
 [tool.ruff]
 select = ["I"]

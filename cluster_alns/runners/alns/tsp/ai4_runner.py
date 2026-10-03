@@ -119,13 +119,23 @@ class AI4TSPRunner(ALNSRunner):
 
         init_solution = random_best_prize_repair(init_solution, 0)
 
-        accept = autofit_weights.autofit(
-            SimulatedAnnealing,
-            init_obj=init_solution.objective(),
-            worse=0.05,
-            accept_prob=0.5,
-            num_iters=self.parameters["iterations"],
-        )
+        if "t_start" in self.parameters:
+            # tuned start temperature, same linear schedule as tune_icb_alns.py
+            t_start = self.parameters["t_start"]
+            accept = SimulatedAnnealing(
+                t_start,
+                1e-6,
+                (t_start - 1e-6) / (self.parameters["iterations"] - 1),
+                method="linear",
+            )
+        else:
+            accept = autofit_weights.autofit(
+                SimulatedAnnealing,
+                init_obj=init_solution.objective(),
+                worse=0.05,
+                accept_prob=0.5,
+                num_iters=self.parameters["iterations"],
+            )
         stop = MaxIterations(self.parameters["iterations"])
         return init_solution, select, accept, stop
 
