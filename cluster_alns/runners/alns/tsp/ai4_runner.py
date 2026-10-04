@@ -1,4 +1,5 @@
 import pickle as pkl
+import random
 import time
 from typing import List, Tuple
 
@@ -45,7 +46,7 @@ class AI4TSPRunner(ALNSRunner):
     def _set_parameters(self) -> None:
         self.parameters = readJSONFile(self.path_parameters)
         self.path_instance = self.path_instance / self.parameters["instance_file"]
-        self.seed = self.parameters["rseed"]
+        self.seed = self.parameters["rseed"] if self.seed_override is None else self.seed_override
         self.iterations = self.parameters["iterations"]
         self.instances_size = self.parameters["instance_nr"]
         self.n_customers = self.parameters["customers"]
@@ -140,6 +141,12 @@ class AI4TSPRunner(ALNSRunner):
         return init_solution, select, accept, stop
 
     def _run(self, ith_instance: int) -> Tuple[float, List[int], float, np.ndarray]:
+        # one reproducible random stream per (seed, instance)
+        seed = self.seed * 1000 + ith_instance
+        random.seed(seed)
+        np.random.seed(seed)
+        self.random_state = self.alns._rnd_state = rnd.RandomState(seed)
+
         start_time = time.time()
         init_solution, select, accept, stop = self._setup(ith_instance)
         pool = None

@@ -27,7 +27,8 @@ class ALNSRunner(ABC):
     exp_time: float
     alns: ALNS
 
-    def __init__(self, path_parameters: Path, path_instance: Path) -> None:
+    def __init__(self, path_parameters: Path, path_instance: Path, seed: int | None = None) -> None:
+        self.seed_override = seed
         self.path_parameters = path_parameters.resolve()
         self.path_instance = path_instance.resolve()
         self._set_parameters()

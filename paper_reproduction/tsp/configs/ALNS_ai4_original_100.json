@@ -9,6 +9,7 @@
     "w3": 17.6,
     "dod": 0.35,
     "decay": 0.65,
+    "t_start": 1.37,
     "use_cluster": false,
     "use_pca": false
 }

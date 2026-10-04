@@ -7,7 +7,9 @@ from tqdm import tqdm
 import cluster_alns.rl.environments
 
 
-def evaluate(config_path, model_path="results/model.zip", instance=1) -> pd.DataFrame:
+def evaluate(
+    config_path, model_path="results/model.zip", instance=1, seed=None, iterations=None
+) -> pd.DataFrame:
     import time
 
     import gymnasium as gym
@@ -18,11 +20,14 @@ def evaluate(config_path, model_path="results/model.zip", instance=1) -> pd.Data
 
     config = RLConfig.from_yaml(config_path)
     model = PPO.load(model_path, device="cpu")
-    env = gym.make(config.environment.gym_id)
+    # the policy is trained with 100 iterations; evaluation may use another budget
+    env = gym.make(config.environment.gym_id, **({"iterations": iterations} if iterations else {}))
+    if seed is not None:
+        model.set_random_seed(seed)
 
     training_objectives = np.zeros(1000)
 
-    obs, _ = env.reset(options={"instance": instance})
+    obs, _ = env.reset(seed=seed, options={"instance": instance})
     begin = time.time()
     for step in range(1001):
         actions, _ = model.predict(obs)

@@ -140,6 +140,10 @@ class AI4TSPEnv(gym.Env):
         The reset method: returns the current state of the environment (first state after initialization/reset)
         """
 
+        if seed is not None:
+            random.seed(seed)
+            np.random.seed(seed)
+            self.rnd_state = rnd.RandomState(seed)
         SEED = random.randint(0, 100000000)
 
         # randomly select problem instance
@@ -151,7 +155,7 @@ class AI4TSPEnv(gym.Env):
         dist_matrix_data = self.distance_matrix[ith_instance - 1]
 
         nodes = [(i + 1) for i in range(0, len(X_))]
-        random_state = rnd.RandomState()
+        random_state = rnd.RandomState(seed)
         # Calculate K-Optimal (Elbow) if clustering is active
         k_optimal = 5
         if self.use_cluster:
