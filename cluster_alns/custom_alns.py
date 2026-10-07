@@ -216,6 +216,8 @@ class ALNS:
 
             destroyed = d_operator(curr, self._rnd_state, **kwargs)
             cand = r_operator(destroyed, self._rnd_state, **kwargs)
+            # the cluster priority list is only valid in the iteration that created it
+            cand.__dict__.pop("priority_list", None)
 
             best, curr, outcome = self._eval_cand(accept, best, curr, cand, **kwargs)
 

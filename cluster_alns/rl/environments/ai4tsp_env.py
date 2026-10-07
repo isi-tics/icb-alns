@@ -233,6 +233,7 @@ class AI4TSPEnv(gym.Env):
 
         r_name, r_operator = self.dr_alns.repair_operators[r_idx]
         candidate = r_operator(destroyed, self.rnd_state, use_pca=self.use_pca)
+        candidate.__dict__.pop("priority_list", None)
 
         new_best, new_current = self.consider_candidate(best, current, candidate)
 
