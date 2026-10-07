@@ -2,21 +2,26 @@
 Final evaluation: every model on every instance size with fixed seeds.
 
 Run after the tuning (tune_icb_alns.py --aggregate), from this folder:
-    python run_seeds.py                                         # everything
+    python run_seeds.py --prepare                               # copy the tuned parameters into the configs (once)
+    python run_seeds.py                                         # everything, one node
     python run_seeds.py --sizes 100 --models pca --seeds 1 2 3  # a slice, e.g. one cluster job
-    python run_seeds.py --summary                               # only rebuild the summary table
+    python run_seeds.py --summary                               # only rebuild the tables
 
-DR-ALNS needs the trained policies in models/dr_alns_<size>.zip.
-Output: results_seeds/AI4-<model>-<size>-<seed>_results.csv and results_seeds/summary_seeds.csv
+DR-ALNS uses the trained policies in models/dr_alns_<size>.zip.
+Output in results_seeds/: one AI4-<model>-<size>-<seed>_results.csv per run,
+summary_seeds.csv (mean and std over seeds) and paired_seeds.csv (paired tests per instance).
 """
 
 import argparse
 import json
 import sys
+from itertools import combinations
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
+from scipy.stats import wilcoxon
 
 from cluster_alns.runners.alns.tsp.ai4_runner import AI4TSPRunner
 
@@ -36,8 +41,9 @@ def apply_tuned(size, tuned_dir):
     tuned = json.loads((tuned_dir / f"icb_alns_best_config_{size}.json").read_text())
     for model in ("kmeans", "pca"):
         params = json.loads(config(model, size).read_text())
-        params.update({key: tuned[key] for key in TUNED_KEYS})
-        config(model, size).write_text(json.dumps(params, indent=4) + "\n")
+        new = {**params, **{key: tuned[key] for key in TUNED_KEYS}}
+        if new != params:  # parallel jobs must not rewrite a config another job is reading
+            config(model, size).write_text(json.dumps(new, indent=4) + "\n")
 
 
 def run_alns(model, size, seed, data, out, instances):
@@ -71,14 +77,32 @@ def run_rl(size, seed, out, instances):
 
 
 def summary(out):
-    """Mean prize over the instances of each run, then mean and std over the seeds."""
-    rows = []
+    """Mean prize per run and seed, and paired comparisons per instance (prize averaged over seeds)."""
+    runs = []
     for path in out.glob("AI4-*_results.csv"):
         _, model, size, seed = path.stem.removesuffix("_results").split("-")
-        prize = -pd.read_csv(path, sep=";")["best_objective"].mean()
-        rows.append({"size": int(size), "model": model, "seed": int(seed), "prize": prize})
-    table = pd.DataFrame(rows).groupby(["size", "model"])["prize"].agg(["mean", "std", "count"])
+        prize = -pd.read_csv(path, sep=";")["best_objective"]
+        runs.append(pd.DataFrame({"size": int(size), "model": model, "seed": int(seed),
+                                  "instance": range(len(prize)), "prize": prize}))
+    runs = pd.concat(runs)
+    per_seed = runs.groupby(["size", "model", "seed"])["prize"].mean()
+    table = per_seed.groupby(["size", "model"]).agg(["mean", "std", "count"])
     table.to_csv(out / "summary_seeds.csv")
+
+    paired = []
+    for size, group in runs.groupby("size"):
+        wide = group.groupby(["instance", "model"])["prize"].mean().unstack().dropna()
+        for a, b in combinations(wide.columns, 2):
+            diff = wide[a] - wide[b]
+            half = 1.96 * diff.std(ddof=1) / np.sqrt(len(diff))
+            paired.append({
+                "size": size, "a": a, "b": b, "instances": len(diff),
+                "mean_diff": diff.mean(), "ci_low": diff.mean() - half, "ci_high": diff.mean() + half,
+                "pct": 100 * diff.mean() / wide[b].mean(), "median_diff": diff.median(),
+                "wins_a": int((diff > 0.01).sum()), "wins_b": int((diff < -0.01).sum()),
+                "wilcoxon_p": wilcoxon(wide[a], wide[b]).pvalue if diff.abs().sum() else 1.0,
+            })
+    pd.DataFrame(paired).to_csv(out / "paired_seeds.csv", index=False)
     return table
 
 
@@ -91,16 +115,18 @@ if __name__ == "__main__":
     parser.add_argument("--out", type=Path, default=HERE / "results_seeds")
     parser.add_argument("--tuned-dir", type=Path, default=HERE.parents[1] / "tuning_bo")
     parser.add_argument("--instances", type=int, default=None, help="Only for smoke tests")
+    parser.add_argument("--prepare", action="store_true", help="Only copy the tuned parameters")
     parser.add_argument("--summary", action="store_true", help="Skip the runs, only summarise")
     args = parser.parse_args()
 
     for size in [] if args.summary else args.sizes:
-        if {"kmeans", "pca"} & set(args.models):
+        if args.prepare or {"kmeans", "pca"} & set(args.models):
             apply_tuned(size, args.tuned_dir)
-        for seed in args.seeds:
+        for seed in [] if args.prepare else args.seeds:
             for model in args.models:
                 if model == "rl":
                     run_rl(size, seed, args.out, args.instances)
                 else:
                     run_alns(model, size, seed, args.data, args.out, args.instances)
-    print(summary(args.out))
+    if not args.prepare:
+        print(summary(args.out))

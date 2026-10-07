@@ -28,6 +28,10 @@ from cluster_alns.tsp.problem.initial_solution import ai4_initial_solution
 from cluster_alns.tsp.utils import find_optimal_k_elbow_op  # Added
 from cluster_alns.utils import readJSONFile
 
+# destroy x repair pairs the roulette may draw: the cluster repair needs the
+# priority list, so it only follows the cluster destroy (which may use any repair)
+CLUSTER_COUPLING = np.array([[1, 1, 1, 0]] * 3 + [[1, 1, 1, 1]], dtype=bool)
+
 DATA_MAP = {
     20: (0, 250),
     50: (250, 500),
@@ -116,6 +120,7 @@ class AI4TSPRunner(ALNSRunner):
             decay=self.parameters["decay"],
             num_destroy=4 if self.use_cluster else 3,
             num_repair=4 if self.use_cluster else 3,
+            op_coupling=CLUSTER_COUPLING if self.use_cluster else None,
         )
 
         init_solution = random_best_prize_repair(init_solution, 0)

@@ -67,6 +67,7 @@ from cluster_alns.tsp.operators.ai4.repair import (
 )
 from cluster_alns.tsp.problem.ai4_state import AI4TSPState
 from cluster_alns.tsp.problem.initial_solution import ai4_initial_solution
+from cluster_alns.runners.alns.tsp.ai4_runner import CLUSTER_COUPLING
 from cluster_alns.tsp.utils import find_optimal_k_elbow_op
 
 # ── Constants (directly from paper) ───────────────────────────────────────────
@@ -142,6 +143,7 @@ def _eval_one(args):
         decay=cfg["decay"],
         num_destroy=4,
         num_repair=4,
+        op_coupling=CLUSTER_COUPLING,
     )
 
     result = alns.iterate(
