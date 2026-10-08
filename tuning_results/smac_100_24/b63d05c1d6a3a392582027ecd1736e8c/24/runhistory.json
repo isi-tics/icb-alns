@@ -1,0 +1,70 @@
+{
+  "stats": {
+    "submitted": 3,
+    "finished": 3,
+    "running": 0
+  },
+  "data": [
+    {
+      "config_id": 1,
+      "instance": null,
+      "seed": 1975759266,
+      "budget": null,
+      "cost": -11.752893333333335,
+      "time": 1703.9480786323547,
+      "cpu_time": 0.046875,
+      "status": 1,
+      "starttime": 1771792359.2810438,
+      "endtime": 1771794063.2291224,
+      "additional_info": {}
+    },
+    {
+      "config_id": 1,
+      "instance": null,
+      "seed": 1264583555,
+      "budget": null,
+      "cost": -11.683306666666667,
+      "time": 1667.5669798851013,
+      "cpu_time": 0.03125,
+      "status": 1,
+      "starttime": 1771794063.2291224,
+      "endtime": 1771795730.7961023,
+      "additional_info": {}
+    },
+    {
+      "config_id": 2,
+      "instance": null,
+      "seed": 1975759266,
+      "budget": null,
+      "cost": -12.251306666666666,
+      "time": 2177.5497872829437,
+      "cpu_time": 0.03125,
+      "status": 1,
+      "starttime": 1771795730.8092916,
+      "endtime": 1771797908.3600686,
+      "additional_info": {}
+    }
+  ],
+  "configs": {
+    "1": {
+      "decay": 0.6083392803557,
+      "dod": 0.7138450175524,
+      "t_start": 1.7923312732764,
+      "w1": 32.524588285014,
+      "w2": 10.3102072607726,
+      "w3": 34.7603420261294
+    },
+    "2": {
+      "decay": 0.8254002560861,
+      "dod": 0.373503485322,
+      "t_start": 4.307359670857,
+      "w1": 15.1272079907358,
+      "w2": 45.3438702505082,
+      "w3": 16.5114901959896
+    }
+  },
+  "config_origins": {
+    "1": "Initial Design: Sobol",
+    "2": "Initial Design: Sobol"
+  }
+}

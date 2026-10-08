@@ -1,4 +1,5 @@
 import pickle as pkl
+import random
 import time
 from typing import List, Tuple
 
@@ -27,6 +28,10 @@ from cluster_alns.tsp.problem.initial_solution import ai4_initial_solution
 from cluster_alns.tsp.utils import find_optimal_k_elbow_op  # Added
 from cluster_alns.utils import readJSONFile
 
+# destroy x repair pairs the roulette may draw: the cluster repair needs the
+# priority list, so it only follows the cluster destroy (which may use any repair)
+CLUSTER_COUPLING = np.array([[1, 1, 1, 0]] * 3 + [[1, 1, 1, 1]], dtype=bool)
+
 DATA_MAP = {
     20: (0, 250),
     50: (250, 500),
@@ -45,7 +50,7 @@ class AI4TSPRunner(ALNSRunner):
     def _set_parameters(self) -> None:
         self.parameters = readJSONFile(self.path_parameters)
         self.path_instance = self.path_instance / self.parameters["instance_file"]
-        self.seed = self.parameters["rseed"]
+        self.seed = self.parameters["rseed"] if self.seed_override is None else self.seed_override
         self.iterations = self.parameters["iterations"]
         self.instances_size = self.parameters["instance_nr"]
         self.n_customers = self.parameters["customers"]
@@ -115,21 +120,38 @@ class AI4TSPRunner(ALNSRunner):
             decay=self.parameters["decay"],
             num_destroy=4 if self.use_cluster else 3,
             num_repair=4 if self.use_cluster else 3,
+            op_coupling=CLUSTER_COUPLING if self.use_cluster else None,
         )
 
         init_solution = random_best_prize_repair(init_solution, 0)
 
-        accept = autofit_weights.autofit(
-            SimulatedAnnealing,
-            init_obj=init_solution.objective(),
-            worse=0.05,
-            accept_prob=0.5,
-            num_iters=self.parameters["iterations"],
-        )
+        if "t_start" in self.parameters:
+            # tuned start temperature, same linear schedule as tune_icb_alns.py
+            t_start = self.parameters["t_start"]
+            accept = SimulatedAnnealing(
+                t_start,
+                1e-6,
+                (t_start - 1e-6) / (self.parameters["iterations"] - 1),
+                method="linear",
+            )
+        else:
+            accept = autofit_weights.autofit(
+                SimulatedAnnealing,
+                init_obj=init_solution.objective(),
+                worse=0.05,
+                accept_prob=0.5,
+                num_iters=self.parameters["iterations"],
+            )
         stop = MaxIterations(self.parameters["iterations"])
         return init_solution, select, accept, stop
 
     def _run(self, ith_instance: int) -> Tuple[float, List[int], float, np.ndarray]:
+        # one reproducible random stream per (seed, instance)
+        seed = self.seed * 1000 + ith_instance
+        random.seed(seed)
+        np.random.seed(seed)
+        self.random_state = self.alns._rnd_state = rnd.RandomState(seed)
+
         start_time = time.time()
         init_solution, select, accept, stop = self._setup(ith_instance)
         pool = None

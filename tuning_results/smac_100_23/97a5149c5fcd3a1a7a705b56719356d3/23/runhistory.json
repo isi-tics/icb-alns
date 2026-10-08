@@ -1,0 +1,96 @@
+{
+  "stats": {
+    "submitted": 5,
+    "finished": 5,
+    "running": 0
+  },
+  "data": [
+    {
+      "config_id": 1,
+      "instance": null,
+      "seed": 74293843,
+      "budget": null,
+      "cost": -11.463173333333334,
+      "time": 487.2206063270569,
+      "cpu_time": 0.0,
+      "status": 1,
+      "starttime": 1771788336.1453328,
+      "endtime": 1771788823.3669496,
+      "additional_info": {}
+    },
+    {
+      "config_id": 1,
+      "instance": null,
+      "seed": 726266598,
+      "budget": null,
+      "cost": -11.070200000000002,
+      "time": 504.8969931602478,
+      "cpu_time": 0.015625,
+      "status": 1,
+      "starttime": 1771788823.380666,
+      "endtime": 1771789328.2776592,
+      "additional_info": {}
+    },
+    {
+      "config_id": 2,
+      "instance": null,
+      "seed": 74293843,
+      "budget": null,
+      "cost": -11.89544,
+      "time": 665.7216203212738,
+      "cpu_time": 0.015625,
+      "status": 1,
+      "starttime": 1771789328.279678,
+      "endtime": 1771789994.0023227,
+      "additional_info": {}
+    },
+    {
+      "config_id": 2,
+      "instance": null,
+      "seed": 726266598,
+      "budget": null,
+      "cost": -11.822133333333332,
+      "time": 624.9782259464264,
+      "cpu_time": 0.03125,
+      "status": 1,
+      "starttime": 1771789994.006375,
+      "endtime": 1771790618.9856198,
+      "additional_info": {}
+    },
+    {
+      "config_id": 2,
+      "instance": null,
+      "seed": 1919689768,
+      "budget": null,
+      "cost": -12.004386666666669,
+      "time": 1740.2213678359985,
+      "cpu_time": 0.046875,
+      "status": 1,
+      "starttime": 1771790618.9943209,
+      "endtime": 1771792359.217702,
+      "additional_info": {}
+    }
+  ],
+  "configs": {
+    "1": {
+      "decay": 0.8235189020634,
+      "dod": 0.9453760506585,
+      "t_start": 1.1212122030742,
+      "w1": 46.4676769915968,
+      "w2": 16.911309864372,
+      "w3": 3.8689393084496
+    },
+    "2": {
+      "decay": 0.6780995177105,
+      "dod": 0.4994892399758,
+      "t_start": 3.5202812728006,
+      "w1": 7.6286862138659,
+      "w2": 43.355803983286,
+      "w3": 31.1511769425124
+    }
+  },
+  "config_origins": {
+    "1": "Initial Design: Sobol",
+    "2": "Initial Design: Sobol"
+  }
+}
